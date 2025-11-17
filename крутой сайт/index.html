@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SABpay - Торговая площадка</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        :root {
+            --primary: #6c5ce7;
+            --primary-dark: #5649c0;
+            --secondary: #fd79a8;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --success: #00b894;
+            --danger: #d63031;
+            --warning: #fdcb6e;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: slideUp 0.8s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: var(--dark);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--primary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 20px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav a {
+            color: white;
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav a:hover {
+            background: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .nav a.active {
+            background: var(--primary);
+        }
+
+        .main-content {
+            padding: 30px;
+            min-height: 500px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 20px rgba(108, 92, 231, 0.3);
+            animation: bounceIn 0.8s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.8); opacity: 0; }
+            70% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .balance-amount {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            animation: slideIn 0.6s ease;
+            cursor: pointer;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            border-color: var(--primary);
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .product-price {
+            color: var(--primary);
+            font-size: 1.5em;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(108, 92, 231, 0.4);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
+            outline: none;
+        }
+
+        .auth-container {
+            max-width: 400px;
+            margin: 50px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: slideUp 0.8s ease;
+        }
+
+        .admin-panel {
+            background: var(--light);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+
+        .withdrawal-item, .ticket-item {
+            background: white;
+            padding: 20px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+            animation: slideIn 0.5s ease;
+        }
+
+        .status-pending {
+            color: var(--warning);
+            font-weight: bold;
+        }
+
+        .status-approved {
+            color: var(--success);
+            font-weight: bold;
+        }
+
+        .commission-badge {
+            background: var(--warning);
+            color: var(--dark);
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .user-id {
+            background: var(--light);
+            padding: 10px 15px;
+            border-radius: 20px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 10px;
+            color: white;
+            z-index: 1000;
+            animation: slideInRight 0.5s ease;
+        }
+
+        .notification.success {
+            background: var(--success);
+        }
+
+        .notification.error {
+            background: var(--danger);
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .game-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite;
+        }
+
+        /* Стили для чата */
+        .chat-container {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 350px;
+            height: 500px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background: var(--primary);
+            color: white;
+            padding: 15px;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            background: var(--light);
+        }
+
+        .message {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            max-width: 80%;
+        }
+
+        .message.own {
+            background: var(--primary);
+            color: white;
+            margin-left: auto;
+        }
+
+        .message.other {
+            background: white;
+            border: 1px solid #ddd;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 15px;
+            border-top: 1px solid #ddd;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--success);
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .offline-dot {
+            width: 8px;
+            height: 8px;
+            background: #ccc;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            margin: 10px 0;
+        }
+
+        .star {
+            font-size: 20px;
+            cursor: pointer;
+            color: #ddd;
+            transition: color 0.2s;
+        }
+
+        .star.active {
+            color: var(--warning);
+        }
+
+        .review-item {
+            background: var(--light);
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border-left: 4px solid var(--warning);
+        }
+
+        .user-profile {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .user-avatar {
+            width: 100px;
+            height: 100px;
+            background: var(--primary);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        .average-rating {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--warning);
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Шапка -->
+        <div class="header">
+            <div class="logo">
+                <div class="logo-icon">SAB</div>
+                <h1>SABpay</h1>
+            </div>
+            <div class="nav">
+                <a href="#" onclick="showPage('main')" class="active">Главная</a>
+                <a href="#" onclick="showPage('profile')">Профиль</a>
+                <a href="#" onclick="showPage('add-product')">Добавить товар</a>
+                <a href="#" onclick="showPage('admin')">Админ</a>
+                <a href="#" onclick="logout()">Выйти</a>
+            </div>
+        </div>
+
+        <!-- Основной контент -->
+        <div class="main-content">
+            <!-- Главная страница -->
+            <div id="main" class="page active">
+                <div class="game-banner">
+                    <h2>🎮 Steal a Brainrot - Roblox 🎮</h2>
+                    <p>Покупайте и продавайте аккаунты безопасно!</p>
+                </div>
+
+                <div class="balance-card">
+                    <h3>Ваш баланс</h3>
+                    <div class="balance-amount" id="userBalance">0.00 ₽</div>
+                    <p>ID: <span id="userId">-</span></p>
+                </div>
+
+                <h2>Товары в продаже</h2>
+                <div class="products-grid" id="productsGrid">
+                    <!-- Товары будут здесь -->
+                </div>
+            </div>
+
+            <!-- Профиль -->
+            <div id="profile" class="page">
+                <h2>👤 Ваш профиль</h2>
+                <div class="balance-card">
+                    <div class="balance-amount" id="profileBalance">0.00 ₽</div>
+                    <div class="user-id">ID: <span id="profileUserId">-</span></div>
+                </div>
+
+                <div class="form-group">
+                    <h3>💰 Пополнение баланса</h3>
+                    <p style="color: #666; margin: 10px 0;">Интеграция с UMoney скоро будет добавлена</p>
+                </div>
+
+                <div class="form-group">
+                    <h3>💸 Вывод средств</h3>
+                    <p style="color: #666; margin: 10px 0;">Минимальная сумма: 300 ₽</p>
+                    <input type="number" class="form-control" id="withdrawAmount" placeholder="Сумма" min="300">
+                    <input type="text" class="form-control" id="walletNumber" placeholder="Номер кошелька" style="margin-top: 10px;">
+                    <button class="btn btn-primary" onclick="createWithdrawal()" style="margin-top: 15px; width: 100%;">
+                        Подать заявку на вывод
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <h3>📨 Подать жалобу</h3>
+                    <input type="text" class="form-control" id="ticketSubject" placeholder="Тема жалобы">
+                    <textarea class="form-control" id="ticketMessage" placeholder="Сообщение" rows="4" style="margin-top: 10px;"></textarea>
+                    <button class="btn btn-danger" onclick="createTicket()" style="margin-top: 15px; width: 100%;">
+                        Отправить жалобу
+                    </button>
+                </div>
+
+                <h3 style="margin-top: 30px;">📦 Ваши товары</h3>
+                <div class="products-grid" id="userProductsGrid">
+                    <!-- Товары пользователя -->
+                </div>
+
+                <h3 style="margin-top: 30px;">⭐ Ваши отзывы</h3>
+                <div id="userReviews">
+                    <!-- Отзывы о пользователе -->
+                </div>
+            </div>
+
+            <!-- Добавление товара -->
+            <div id="add-product" class="page">
+                <h2>➕ Добавить товар</h2>
+                <div class="form-group">
+                    <input type="text" class="form-control" id="productTitle" placeholder="Название товара">
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" id="productDescription" placeholder="Описание товара" rows="4"></textarea>
+                </div>
+                <div class="form-group">
+                    <input type="number" class="form-control" id="productPrice" placeholder="Цена в рублях">
+                </div>
+                <div class="form-group">
+                    <p style="color: #666; margin: 10px 0;">
+                        💡 Комиссия системы: <span class="commission-badge">15%</span>
+                    </p>
+                </div>
+                <button class="btn btn-primary" onclick="addProduct()" style="width: 100%;">
+                    Выставить на продажу
+                </button>
+            </div>
+
+            <!-- Админ панель -->
+            <div id="admin" class="page">
+                <h2>⚙️ Панель администратора</h2>
+                
+                <div class="admin-panel">
+                    <h3>💳 Пополнение баланса по ID</h3>
+                    <div class="form-group">
+                        <input type="number" class="form-control" id="adminUserId" placeholder="ID пользователя">
+                        <input type="number" class="form-control" id="adminAmount" placeholder="Сумма пополнения" style="margin-top: 10px;">
+                        <button class="btn btn-success" onclick="adminAddBalance()" style="margin-top: 15px; width: 100%;">
+                            Пополнить баланс
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="admin-panel">
+                    <h3>📥 Заявки на вывод</h3>
+                    <div id="withdrawalsList">
+                        <!-- Заявки будут здесь -->
+                    </div>
+                </div>
+
+                <div class="admin-panel">
+                    <h3>📨 Жалобы пользователей</h3>
+                    <div id="ticketsList">
+                        <!-- Жалобы будут здесь -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Чат -->
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <span id="chatWithUser">Чат</span>
+            <button class="btn btn-danger" onclick="closeChat()" style="padding: 5px 10px;">✕</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <!-- Сообщения чата -->
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Введите сообщение...">
+            <button class="btn btn-primary" onclick="sendMessage()" style="padding: 10px 15px;">➤</button>
+        </div>
+    </div>
+
+    <script>
+        // Имитация базы данных
+        let users = JSON.parse(localStorage.getItem('sabpay_users')) || [];
+        let products = JSON.parse(localStorage.getItem('sabpay_products')) || [];
+        let withdrawals = JSON.parse(localStorage.getItem('sabpay_withdrawals')) || [];
+        let tickets = JSON.parse(localStorage.getItem('sabpay_tickets')) || [];
+        let chats = JSON.parse(localStorage.getItem('sabpay_chats')) || [];
+        let reviews = JSON.parse(localStorage.getItem('sabpay_reviews')) || [];
+        let transactions = JSON.parse(localStorage.getItem('sabpay_transactions')) || [];
+        let currentUser = JSON.parse(localStorage.getItem('sabpay_currentUser'));
+        let currentChat = null;
+        let onlineUsers = {};
+
+        // Отслеживание онлайн статуса
+        setInterval(() => {
+            if (currentUser) {
+                onlineUsers[currentUser.id] = Date.now();
+                localStorage.setItem('sabpay_onlineUsers', JSON.stringify(onlineUsers));
+            }
+        }, 5000);
+
+        // Проверка авторизации
+        if (!currentUser) {
+            showAuthForm();
+        } else {
+            onlineUsers = JSON.parse(localStorage.getItem('sabpay_onlineUsers')) || {};
+            onlineUsers[currentUser.id] = Date.now();
+            localStorage.setItem('sabpay_onlineUsers', JSON.stringify(onlineUsers));
+            updateUI();
+        }
+
+        function showAuthForm() {
+            const authHTML = `
+                <div class="auth-container">
+                    <h2 style="text-align: center; margin-bottom: 30px;">SABpay 🔐</h2>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="authUsername" placeholder="Логин">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="authPassword" placeholder="Пароль">
+                    </div>
+                    <button class="btn btn-primary" onclick="login()" style="width: 100%; margin-bottom: 15px;">
+                        Войти
+                    </button>
+                    <button class="btn" onclick="showRegister()" style="width: 100%; background: #f8f9fa;">
+                        Зарегистрироваться
+                    </button>
+                </div>
+            `;
+            document.querySelector('.main-content').innerHTML = authHTML;
+        }
+
+        function showRegister() {
+            const registerHTML = `
+                <div class="auth-container">
+                    <h2 style="text-align: center; margin-bottom: 30px;">Регистрация 🚀</h2>
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="regUsername" placeholder="Логин">
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-control" id="regEmail" placeholder="Email">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" id="regPassword" placeholder="Пароль">
+                    </div>
+                    <button class="btn btn-primary" onclick="register()" style="width: 100%; margin-bottom: 15px;">
+                        Создать аккаунт
+                    </button>
+                    <button class="btn" onclick="showAuthForm()" style="width: 100%; background: #f8f9fa;">
+                        Назад к входу
+                    </button>
+                </div>
+            `;
+            document.querySelector('.main-content').innerHTML = registerHTML;
+        }
+
+        function register() {
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            if (username && email && password) {
+                const newUser = {
+                    id: Date.now(),
+                    username,
+                    email,
+                    password,
+                    balance: 0, // Начальный баланс 0
+                    avatar: 'default.png',
+                    registrationDate: new Date().toISOString()
+                };
+
+                users.push(newUser);
+                localStorage.setItem('sabpay_users', JSON.stringify(users));
+                
+                showNotification('Аккаунт успешно создан!', 'success');
+                showAuthForm();
+            } else {
+                showNotification('Заполните все поля!', 'error');
+            }
+        }
+
+        function login() {
+            const username = document.getElementById('authUsername').value;
+            const password = document.getElementById('authPassword').value;
+
+            if (username === 'Administrator' && password === '2013010010') {
+                currentUser = {
+                    id: 1,
+                    username: 'Administrator',
+                    balance: 999999,
+                    isAdmin: true
+                };
+            } else {
+                currentUser = users.find(u => u.username === username && u.password === password);
+            }
+
+            if (currentUser) {
+                localStorage.setItem('sabpay_currentUser', JSON.stringify(currentUser));
+                onlineUsers[currentUser.id] = Date.now();
+                localStorage.setItem('sabpay_onlineUsers', JSON.stringify(onlineUsers));
+                location.reload();
+            } else {
+                showNotification('Неверный логин или пароль!', 'error');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('sabpay_currentUser');
+            location.reload();
+        }
+
+        function updateUI() {
+            document.getElementById('userBalance').textContent = currentUser.balance + ' ₽';
+            document.getElementById('userId').textContent = currentUser.id;
+            document.getElementById('profileBalance').textContent = currentUser.balance + ' ₽';
+            document.getElementById('profileUserId').textContent = currentUser.id;
+
+            loadProducts();
+            loadUserProducts();
+            loadUserReviews();
+            if (currentUser.username === 'Administrator') {
+                loadAdminData();
+            }
+        }
+
+        function loadProducts() {
+            const productsGrid = document.getElementById('productsGrid');
+            productsGrid.innerHTML = '';
+
+            const activeProducts = products.filter(p => p.status === 'active');
+
+            if (activeProducts.length === 0) {
+                productsGrid.innerHTML = '<p style="text-align: center; color: #666; grid-column: 1/-1;">Товаров пока нет</p>';
+                return;
+            }
+
+            activeProducts.forEach(product => {
+                const seller = users.find(u => u.id === product.user_id);
+                const isOnline = isUserOnline(seller.id);
+                const productCard = `
+                    <div class="product-card" onclick="openProduct(${product.id})">
+                        <div class="product-image">
+                            🎮 ${product.game_name}
+                        </div>
+                        <h3>${product.title}</h3>
+                        <p>${product.description}</p>
+                        <div class="product-price">${product.price} ₽</div>
+                        <p style="color: #666; font-size: 14px;">
+                            <span class="${isOnline ? 'online-dot' : 'offline-dot'}"></span>
+                            Продавец: ${seller.username}
+                            ${isOnline ? '(online)' : '(offline)'}
+                        </p>
+                        <button class="btn btn-primary" onclick="event.stopPropagation(); openChat(${product.user_id}, '${seller.username}')" style="width: 100%; margin-top: 10px;">
+                            Написать продавцу
+                        </button>
+                    </div>
+                `;
+                productsGrid.innerHTML += productCard;
+            });
+        }
+
+        function loadUserProducts() {
+            const userProductsGrid = document.getElementById('userProductsGrid');
+            userProductsGrid.innerHTML = '';
+
+            const userProducts = products.filter(p => p.user_id === currentUser.id);
+
+            if (userProducts.length === 0) {
+                userProductsGrid.innerHTML = '<p style="text-align: center; color: #666;">У вас нет товаров</p>';
+                return;
+            }
+
+            userProducts.forEach(product => {
+                const productCard = `
+                    <div class="product-card">
+                        <div class="product-image">
+                            🎮 ${product.game_name}
+                        </div>
+                        <h3>${product.title}</h3>
+                        <p>${product.description}</p>
+                        <div class="product-price">${product.price} ₽</div>
+                        <p style="color: #666; font-size: 14px;">Статус: ${getStatusText(product.status)}</p>
+                        ${product.status === 'active' ? `
+                            <button class="btn btn-danger" onclick="removeProduct(${product.id})" style="width: 100%; margin-top: 10px;">
+                                Снять с продажи
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                userProductsGrid.innerHTML += productCard;
+            });
+        }
+
+        function loadUserReviews() {
+            const userReviews = document.getElementById('userReviews');
+            userReviews.innerHTML = '';
+
+            const userReceivedReviews = reviews.filter(r => r.seller_id === currentUser.id);
+            const averageRating = userReceivedReviews.length > 0 ? 
+                (userReceivedReviews.reduce((sum, r) => sum + r.rating, 0) / userReceivedReviews.length).toFixed(1) : '0.0';
+
+            userReviews.innerHTML = `
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <div class="average-rating">⭐ ${averageRating}/5</div>
+                    <p>На основе ${userReceivedReviews.length} отзывов</p>
+                </div>
+            `;
+
+            userReceivedReviews.forEach(review => {
+                const buyer = users.find(u => u.id === review.buyer_id);
+                userReviews.innerHTML += `
+                    <div class="review-item">
+                        <div class="rating-stars">
+                            ${getStarsHTML(review.rating)}
+                        </div>
+                        <p><strong>${buyer.username}:</strong> ${review.comment}</p>
+                        <p style="color: #666; font-size: 12px;">${new Date(review.date).toLocaleDateString()}</p>
+                    </div>
+                `;
+            });
+        }
+
+        function getStarsHTML(rating) {
+            let stars = '';
+            for (let i = 1; i <= 5; i++) {
+                stars += `<span class="star ${i <= rating ? 'active' : ''}">⭐</span>`;
+            }
+            return stars;
+        }
+
+        function openProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            const seller = users.find(u => u.id === product.user_id);
+            
+            if (confirm(`Купить "${product.title}" за ${product.price}₽?`)) {
+                buyProduct(productId);
+            }
+        }
+
+        function isUserOnline(userId) {
+            const lastSeen = onlineUsers[userId];
+            if (!lastSeen) return false;
+            return (Date.now() - lastSeen) < 30000; // 30 секунд
+        }
+
+        function openChat(userId, username) {
+            currentChat = userId;
+            document.getElementById('chatWithUser').textContent = `Чат с ${username}`;
+            document.getElementById('chatContainer').style.display = 'flex';
+            loadChatMessages();
+        }
+
+        function closeChat() {
+            document.getElementById('chatContainer').style.display = 'none';
+            currentChat = null;
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const message = input.value.trim();
+            
+            if (message && currentChat) {
+                const chat = chats.find(c => 
+                    (c.user1 === currentUser.id && c.user2 === currentChat) ||
+                    (c.user1 === currentChat && c.user2 === currentUser.id)
+                );
+
+                const newMessage = {
+                    id: Date.now(),
+                    from: currentUser.id,
+                    to: currentChat,
+                    text: message,
+                    timestamp: new Date().toISOString()
+                };
+
+                if (chat) {
+                    chat.messages.push(newMessage);
+                } else {
+                    chats.push({
+                        id: Date.now(),
+                        user1: currentUser.id,
+                        user2: currentChat,
+                        messages: [newMessage]
+                    });
+                }
+
+                localStorage.setItem('sabpay_chats', JSON.stringify(chats));
+                input.value = '';
+                loadChatMessages();
+            }
+        }
+
+        function loadChatMessages() {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML = '';
+
+            if (!currentChat) return;
+
+            const chat = chats.find(c => 
+                (c.user1 === currentUser.id && c.user2 === currentChat) ||
+                (c.user1 === currentChat && c.user2 === currentUser.id)
+            );
+
+            if (chat) {
+                chat.messages.forEach(message => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = `message ${message.from === currentUser.id ? 'own' : 'other'}`;
+                    messageDiv.textContent = message.text;
+                    chatMessages.appendChild(messageDiv);
+                });
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        function addProduct() {
+            const title = document.getElementById('productTitle').value;
+            const description = document.getElementById('productDescription').value;
+            const price = parseFloat(document.getElementById('productPrice').value);
+
+            if (title && description && price) {
+                const newProduct = {
+                    id: Date.now(),
+                    user_id: currentUser.id,
+                    title,
+                    description,
+                    price,
+                    game_name: 'Steal a Brainrot',
+                    seller_name: currentUser.username,
+                    status: 'active'
+                };
+
+                products.push(newProduct);
+                localStorage.setItem('sabpay_products', JSON.stringify(products));
+
+                showNotification('Товар успешно добавлен!', 'success');
+                document.getElementById('productTitle').value = '';
+                document.getElementById('productDescription').value = '';
+                document.getElementById('productPrice').value = '';
+                
+                showPage('main');
+            } else {
+                showNotification('Заполните все поля!', 'error');
+            }
+        }
+
+        function removeProduct(productId) {
+            products = products.filter(p => p.id !== productId);
+            localStorage.setItem('sabpay_products', JSON.stringify(products));
+            showNotification('Товар снят с продажи!', 'success');
+            loadUserProducts();
+        }
+
+        function buyProduct(productId) {
+            const product = products.find(p => p.id === productId);
+            
+            if (currentUser.id === product.user_id) {
+                showNotification('Нельзя купить собственный товар!', 'error');
+                return;
+            }
+
+            if (currentUser.balance >= product.price) {
+                // Блокируем средства
+                currentUser.balance -= product.price;
+                localStorage.setItem('sabpay_currentUser', JSON.stringify(currentUser));
+
+                // Создаем транзакцию
+                const transaction = {
+                    id: Date.now(),
+                    product_id: productId,
+                    buyer_id: currentUser.id,
+                    seller_id: product.user_id,
+                    amount: product.price,
+                    status: 'pending_confirmation',
+                    created_at: new Date().toISOString()
+                };
+
+                transactions.push(transaction);
+                localStorage.setItem('sabpay_transactions', JSON.stringify(transactions));
+
+                // Создаем чат между покупателем и продавцом
+                const existingChat = chats.find(c => 
+                    (c.user1 === currentUser.id && c.user2 === product.user_id) ||
+                    (c.user1 === product.user_id && c.user2 === currentUser.id)
+                );
+
+                if (!existingChat) {
+                    chats.push({
+                        id: Date.now(),
+                        user1: currentUser.id,
+                        user2: product.user_id,
+                        messages: [{
+                            id: Date.now(),
+                            from: currentUser.id,
+                            to: product.user_id,
+                            text: `Я купил ваш товар "${product.title}". Пожалуйста, подтвердите получение ${product.price}₽.`,
+                            timestamp: new Date().toISOString()
+                        }]
+                    });
+                    localStorage.setItem('sabpay_chats', JSON.stringify(chats));
+                }
+
+                showNotification('Товар куплен! Ожидайте подтверждения от продавца.', 'success');
+                updateUI();
+                openChat(product.user_id, product.seller_name);
+            } else {
+                showNotification('Недостаточно средств!', 'error');
+            }
+        }
+
+        function confirmPayment(transactionId) {
+            const transaction = transactions.find(t => t.id === transactionId);
+            if (transaction && transaction.seller_id === currentUser.id) {
+                transaction.status = 'completed';
+                
+                // Переводим деньги продавцу (за вычетом комиссии)
+                const seller = users.find(u => u.id === transaction.seller_id);
+                const commission = transaction.amount * 0.15;
+                const sellerAmount = transaction.amount - commission;
+                
+                seller.balance += sellerAmount;
+                
+                // Обновляем статус товара
+                const product = products.find(p => p.id === transaction.product_id);
+                product.status = 'sold';
+
+                localStorage.setItem('sabpay_transactions', JSON.stringify(transactions));
+                localStorage.setItem('sabpay_users', JSON.stringify(users));
+                localStorage.setItem('sabpay_products', JSON.stringify(products));
+
+                showNotification('Платеж подтвержден! Средства зачислены.', 'success');
+                updateUI();
+            }
+        }
+
+        function createWithdrawal() {
+            const amount = parseFloat(document.getElementById('withdrawAmount').value);
+            const wallet = document.getElementById('walletNumber').value;
+
+            if (amount >= 300 && currentUser.balance >= amount) {
+                const withdrawal = {
+                    id: Date.now(),
+                    user_id: currentUser.id,
+                    username: currentUser.username,
+                    amount,
+                    wallet_number: wallet,
+                    status: 'pending'
+                };
+
+                withdrawals.push(withdrawal);
+                localStorage.setItem('sabpay_withdrawals', JSON.stringify(withdrawals));
+
+                currentUser.balance -= amount;
+                localStorage.setItem('sabpay_currentUser', JSON.stringify(currentUser));
+
+                showNotification('Заявка на вывод отправлена!', 'success');
+                updateUI();
+                
+                // Очищаем поля
+                document.getElementById('withdrawAmount').value = '';
+                document.getElementById('walletNumber').value = '';
+            } else {
+                showNotification('Недостаточно средств или сумма меньше 300₽!', 'error');
+            }
+        }
+
+        function createTicket() {
+            const subject = document.getElementById('ticketSubject').value;
+            const message = document.getElementById('ticketMessage').value;
+
+            if (subject && message) {
+                const ticket = {
+                    id: Date.now(),
+                    user_id: currentUser.id,
+                    username: currentUser.username,
+                    subject,
+                    message,
+                    status: 'open',
+                    created_at: new Date().toISOString()
+                };
+
+                tickets.push(ticket);
+                localStorage.setItem('sabpay_tickets', JSON.stringify(tickets));
+
+                showNotification('Жалоба отправлена!', 'success');
+                document.getElementById('ticketSubject').value = '';
+                document.getElementById('ticketMessage').value = '';
+            } else {
+                showNotification('Заполните все поля!', 'error');
+            }
+        }
+
+        function loadAdminData() {
+            // Заявки на вывод
+            const withdrawalsList = document.getElementById('withdrawalsList');
+            withdrawalsList.innerHTML = '';
+
+            const pendingWithdrawals = withdrawals.filter(w => w.status === 'pending');
+            if (pendingWithdrawals.length === 0) {
+                withdrawalsList.innerHTML = '<p style="text-align: center; color: #666;">Нет заявок на вывод</p>';
+            } else {
+                pendingWithdrawals.forEach(withdrawal => {
+                    withdrawalsList.innerHTML += `
+                        <div class="withdrawal-item">
+                            <p><strong>Пользователь:</strong> ${withdrawal.username} (ID: ${withdrawal.user_id})</p>
+                            <p><strong>Сумма:</strong> ${withdrawal.amount} ₽</p>
+                            <p><strong>Кошелек:</strong> ${withdrawal.wallet_number}</p>
+                            <button class="btn btn-success" onclick="processWithdrawal(${withdrawal.id}, 'approved')">Одобрить</button>
+                            <button class="btn btn-danger" onclick="processWithdrawal(${withdrawal.id}, 'rejected')">Отклонить</button>
+                        </div>
+                    `;
+                });
+            }
+
+            // Жалобы
+            const ticketsList = document.getElementById('ticketsList');
+            ticketsList.innerHTML = '';
+
+            const openTickets = tickets.filter(t => t.status === 'open');
+            if (openTickets.length === 0) {
+                ticketsList.innerHTML = '<p style="text-align: center; color: #666;">Нет открытых жалоб</p>';
+            } else {
+                openTickets.forEach(ticket => {
+                    ticketsList.innerHTML += `
+                        <div class="ticket-item">
+                            <p><strong>От:</strong> ${ticket.username} (ID: ${ticket.user_id})</p>
+                            <p><strong>Тема:</strong> ${ticket.subject}</p>
+                            <p><strong>Сообщение:</strong> ${ticket.message}</p>
+                            <textarea class="form-control" id="response_${ticket.id}" placeholder="Ответ администратора" rows="2"></textarea>
+                            <button class="btn btn-primary" onclick="answerTicket(${ticket.id})" style="margin-top: 10px;">Ответить</button>
+                        </div>
+                    `;
+                });
+            }
+        }
+
+        function adminAddBalance() {
+            const userId = parseInt(document.getElementById('adminUserId').value);
+            const amount = parseFloat(document.getElementById('adminAmount').value);
+
+            if (userId && amount > 0) {
+                const user = users.find(u => u.id === userId);
+                if (user) {
+                    user.balance += amount;
+                    localStorage.setItem('sabpay_users', JSON.stringify(users));
+                    
+                    showNotification(`Баланс пользователя ${user.username} пополнен на ${amount}₽`, 'success');
+                    document.getElementById('adminUserId').value = '';
+                    document.getElementById('adminAmount').value = '';
+                } else {
+                    showNotification('Пользователь не найден!', 'error');
+                }
+            } else {
+                showNotification('Введите корректные данные!', 'error');
+            }
+        }
+
+        function processWithdrawal(withdrawalId, status) {
+            const withdrawal = withdrawals.find(w => w.id === withdrawalId);
+            withdrawal.status = status;
+            
+            if (status === 'rejected') {
+                // Возвращаем средства пользователю
+                const user = users.find(u => u.id === withdrawal.user_id);
+                user.balance += withdrawal.amount;
+                localStorage.setItem('sabpay_users', JSON.stringify(users));
+            }
+            
+            localStorage.setItem('sabpay_withdrawals', JSON.stringify(withdrawals));
+            loadAdminData();
+            showNotification(`Заявка ${status === 'approved' ? 'одобрена' : 'отклонена'}!`, 'success');
+        }
+
+        function answerTicket(ticketId) {
+            const response = document.getElementById(`response_${ticketId}`).value;
+            const ticket = tickets.find(t => t.id === ticketId);
+            
+            if (response) {
+                ticket.admin_response = response;
+                ticket.status = 'answered';
+                localStorage.setItem('sabpay_tickets', JSON.stringify(tickets));
+                loadAdminData();
+                showNotification('Ответ отправлен!', 'success');
+            }
+        }
+
+        function getStatusText(status) {
+            const statuses = {
+                'open': 'Открыта',
+                'answered': 'Отвечена',
+                'closed': 'Закрыта',
+                'pending': 'В обработке',
+                'approved': 'Одобрена',
+                'rejected': 'Отклонена',
+                'active': 'Активен',
+                'sold': 'Продан',
+                'pending_confirmation': 'Ожидает подтверждения'
+            };
+            return statuses[status] || status;
+        }
+
+        function showNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.querySelectorAll('.nav a').forEach(link => {
+                link.classList.remove('active');
+            });
+
+            document.getElementById(pageId).classList.add('active');
+            event.target.classList.add('active');
+
+            if (pageId === 'admin' && currentUser.username === 'Administrator') {
+                loadAdminData();
+            }
+        }
+
+        // Инициализация демо-данных
+        if (users.length === 0) {
+            users = [
+                {
+                    id: 1,
+                    username: 'Administrator',
+                    email: 'admin@sabpay.ru',
+                    password: '2013010010',
+                    balance: 999999,
+                    isAdmin: true,
+                    registrationDate: new Date().toISOString()
+                }
+            ];
+            localStorage.setItem('sabpay_users', JSON.stringify(users));
+        }
+
+        if (products.length === 0) {
+            products = [
+                {
+                    id: 1,
+                    user_id: 1,
+                    title: "Аккаунт с редкими скинами",
+                    description: "Аккаунт премиум уровня с эксклюзивными предметами",
+                    price: 1500,
+                    game_name: "Steal a Brainrot",
+                    seller_name: "Administrator",
+                    status: "active"
+                }
+            ];
+            localStorage.setItem('sabpay_products', JSON.stringify(products));
+        }
+    </script>
+</body>
+</html>
